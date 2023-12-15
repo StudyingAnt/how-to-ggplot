@@ -9,10 +9,11 @@ data_file <- "C:/Users/CEEL-PC-005/Desktop/Joon/how-to-ggplot/test_data_1.xlsx"
 data <- read_excel(data_file, sheet = "Sheet1", range = "A1:B10")
 
 data$Condition <- factor(data$Condition, levels = c("Ctrl", "A drug", "B drug"))
-data <- data %>% group_by(Condition) %>% summarise(avg = mean(Gene_expression), std = sd(Gene_expression))
-
-bar_plot <- ggplot(data, aes(x=Condition, y=avg, fill=Condition)) + 
+data_summary <- data %>% group_by(Condition) %>% summarise(avg = mean(Gene_expression), std = sd(Gene_expression))
+data_summary
+bar_plot <- ggplot(data_summary, aes(x=Condition, y=avg, fill=Condition)) + 
   geom_bar(stat = "identity", color = "black") +
+  geom_jitter(data=data, aes(x=Condition, y=Gene_expression), width = 0.2) +
   geom_errorbar(aes(ymin=avg-std, ymax=avg+std),
                 width = 0.2) +
   xlab("Treatment") +
@@ -33,7 +34,8 @@ bar_plot <- ggplot(data, aes(x=Condition, y=avg, fill=Condition)) +
     panel.grid.minor = element_blank(),
     panel.border = element_blank(),
     plot.background = element_rect("white")
-  )
+  ) +
+  guides(fill = guide_legend(override.aes = list(shape = NA)))
 bar_plot
 
 figure_file <- "C:/Users/CEEL-PC-005/Desktop/Joon/how-to-ggplot/bar_plot.png"
