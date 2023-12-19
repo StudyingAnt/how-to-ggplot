@@ -87,21 +87,27 @@ data_plot <- data_formated %>% group_by(Sample, Day) %>% summarise(avg = mean(Tu
 
 stderror <- function(x) sd(x)/sqrt(length(x))
 
-ggplot(data_plot, aes(x=Day, y=avg, group=Sample, shape=Sample, color=Sample)) + geom_line()
+max_point <- data_plot %>% summarise(max = max(avg))
+max_points <- unlist(max_point$max)
 
+signif_bracket <- data.frame(
+  X = c(18.5,19,19,18.5),
+  Y = rep(c(as.numeric(max_points[1]), as.numeric(max_points[2])), each = 2)
+)
 
-+ 
+ggplot(data_plot, aes(x=Day, y=avg)) + 
+  geom_line(aes(x=Day, y=avg, color=Sample)) +
   geom_errorbar(aes(ymin=avg, ymax=avg+sem),
                 width = 0.2) +
   geom_point(aes(x=Day, y=avg, shape=Sample, color=Sample), size=2) +
-  geom_line(aes(x=Day, y=avg, color=Sample)) + 
+  geom_path(data=signif_bracket, aes(x=X, y=Y)) +
+  xlab("Days post tumor injection") +ylab(bquote("Tumor volume "(mm^3))) +
   scale_x_continuous(limits = c(0, 20)) +
   scale_y_continuous(limits = c(0,800)) +
   scale_shape_manual(values = c(16, 15)) +
   scale_color_manual(values = c("black", "red")) +
-
-geom_bracket(data=data_plot, aes(x=avg, y=Day),
-  inherit.aes = FALSE,
-  xmin = 10, xmax = 20, y.position = 20,
-  label = "t-test, p < 0.05", coord.flip = TRUE
-)
+  theme_minimal() +
+  theme(
+    legend.title = element_blank(),
+    legend.position = c(0.1,0.9)
+  ) 
