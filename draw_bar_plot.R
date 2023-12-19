@@ -73,6 +73,6 @@ bar_plot <- ggplot(data_summary, aes(x=Condition, y=avg, fill=Condition)) +
   guides(fill = guide_legend(override.aes = list(shape = NA)))
 bar_plot
 
-figure_file <- paste(base_folder, "bar_plot.png", sep = "")
+figure_file <- paste(base_folder, "bar_plot.tiff", sep = "")
 ggsave(figure_file, plot = bar_plot, dpi = 600, width = 7, height = 8, units = "cm")
 
