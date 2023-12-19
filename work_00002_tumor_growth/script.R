@@ -95,19 +95,42 @@ signif_bracket <- data.frame(
   Y = rep(c(as.numeric(max_points[1]), as.numeric(max_points[2])), each = 2)
 )
 
-ggplot(data_plot, aes(x=Day, y=avg)) + 
+ggtext_size <- function(base_size, ratio = 1) {
+  ratio * base_size / ggplot2::.pt
+}
+
+growth_plot <- ggplot(data_plot, aes(x=Day, y=avg)) + 
   geom_line(aes(x=Day, y=avg, color=Sample)) +
-  geom_errorbar(aes(ymin=avg, ymax=avg+sem),
-                width = 0.2) +
+  geom_errorbar(aes(ymin=avg, ymax=avg+sem, color=Sample),
+                width = 0.4) +
   geom_point(aes(x=Day, y=avg, shape=Sample, color=Sample), size=2) +
   geom_path(data=signif_bracket, aes(x=X, y=Y)) +
+  annotate('text', x = 19.5, y = (as.numeric(max_points[1]) + as.numeric(max_points[2]))/2,  
+           label = '<0.0001', 
+           size = ggtext_size(6), 
+           angle='90') +
   xlab("Days post tumor injection") +ylab(bquote("Tumor volume "(mm^3))) +
-  scale_x_continuous(limits = c(0, 20)) +
-  scale_y_continuous(limits = c(0,800)) +
+  scale_x_continuous(breaks = c(0,5,10,15,20), limits = c(0, 20), expand = c(0,0.055)) +
+  scale_y_continuous(breaks = c(0,200,400,600,800), limits = c(0,800), expand = c(0,4)) +
   scale_shape_manual(values = c(16, 15)) +
   scale_color_manual(values = c("black", "red")) +
   theme_minimal() +
   theme(
+    axis.title.x = element_text(size = 6),
+    axis.title.y = element_text(size = 6),
+    axis.text.x = element_text(size = 6),
+    axis.text.y = element_text(size = 6),
+    axis.ticks = element_line(color="black"),
+    legend.text = element_text(size = 6),
     legend.title = element_blank(),
-    legend.position = c(0.1,0.9)
+    legend.position = c(0.2,0.9),
+    legend.key.height = unit(3, 'mm'),
+    legend.spacing.y = unit(1, 'mm'),
+    axis.line = element_line("black"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.background = element_rect("white")
   ) 
+
+figure_file <- paste(base_folder, "plot_final.tiff", sep = "")
+ggsave(figure_file, plot = growth_plot, dpi = 600, width = 8, height = 5, units = "cm")
